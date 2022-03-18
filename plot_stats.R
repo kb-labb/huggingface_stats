@@ -16,11 +16,11 @@ df_total_sum <- df %>%
 p_dl_total <- ggplot(data = df_total_sum, 
               aes(x = date, y = downloads)) +
   geom_line(colour = "firebrick2") +
-  geom_point(shape = 21, size = 1.7, colour = "black", fill = "firebrick2") + 
+  geom_point(shape = 21, size = 3, colour = "black", fill = "firebrick2") + 
   expand_limits(y = 0) +
   scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads), by = 5000)) +
   scale_x_date(date_labels = "%b %d", breaks = unique(df_model_top$date)) +
-  theme_light(base_size = 5) +
+  theme_light(base_size = 8) +
   labs(y = "Number of downloads",
        x = "Date",
        title = "Total number of downloads per month")
@@ -35,11 +35,11 @@ df_sum <- df %>%
 p_dl_org <- ggplot(data = df_sum, 
                       aes(x = date, y = downloads, fill = organization)) +
   geom_line(aes(color = organization)) +
-  geom_point(shape = 21, size = 1.7, colour = "black") + 
+  geom_point(shape = 21, size = 3, colour = "black") + 
   expand_limits(y = 0) +
   scale_y_continuous(breaks = seq(0, max(df_sum$downloads) + 1000, by = 5000)) +
   scale_x_date(date_labels = "%b %d", breaks = unique(df_model_top$date)) +
-  theme_light(base_size = 5) +
+  theme_light(base_size = 8) +
   labs(y = "Number of downloads",
        x = "Date",
        title = "Total number of downloads by organization",
@@ -61,8 +61,8 @@ df_model_top <- df[df$model_name %in% df_model$model_name, ]
 p_dl_model <- ggplot(data = df_model_top, 
                      aes(x = date, y = downloads, fill = fct_reorder(model_name, desc(downloads)))) +
   geom_line(aes(color = fct_reorder(model_name, desc(downloads)))) +
-  geom_point(shape = 21, size = 1.7, colour = "black") +
-  theme_light(base_size = 5) +
+  geom_point(shape = 21, size = 3, colour = "black") +
+  theme_light(base_size = 8) +
   scale_y_continuous(breaks = seq(0, max(df_model_top$downloads) + 1000, by = 5000)) +
   scale_x_date(date_labels = "%b %d", breaks = unique(df_model_top$date)) +
   expand_limits(y = 0) +
