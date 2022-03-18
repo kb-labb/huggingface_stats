@@ -8,9 +8,9 @@ get_organization_models <- function(org_url){
     html_nodes("a") %>%
     html_attr("href")
   
-  org_model_urls <- paste0("https://huggingface.co", organization_models)
+  # org_model_urls <- paste0("https://huggingface.co", organization_models)
   
-  return(org_model_urls)
+  return(organization_models)
 }
 
 get_download_stats <- function(model_url){
@@ -25,8 +25,8 @@ get_download_stats <- function(model_url){
               "downloads" = as.numeric(downloads)))
 }
 
-kblab_models <- get_organization_models("https://huggingface.co/KBLab")
-kb_models <- get_organization_models("https://huggingface.co/KB")
+kblab_models <- get_organization_models("KBLab.html") # https://huggingface.co/KBLab 
+kb_models <- get_organization_models("KB.html") # https://huggingface.co/KBLab
 
 df_kblab <- purrr::map_df(kblab_models, get_download_stats)
 df_kb <- purrr::map_df(kb_models, get_download_stats)
