@@ -18,12 +18,12 @@ p_dl_total <- ggplot(data = df_total_sum,
   geom_line(colour = "firebrick2") +
   geom_point(shape = 21, size = 3, colour = "black", fill = "firebrick2") + 
   expand_limits(y = 0) +
-  scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads), by = 5000)) +
+  scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 1000, by = 5000)) +
   scale_x_date(date_labels = "%b %d", breaks = unique(df_model_top$date)) +
   theme_light(base_size = 8) +
   labs(y = "Number of downloads",
        x = "Date",
-       title = "Total number of downloads per month")
+       title = "Total number of downloads per month for KB's models on Huggingface")
 
 
 
@@ -42,7 +42,7 @@ p_dl_org <- ggplot(data = df_sum,
   theme_light(base_size = 8) +
   labs(y = "Number of downloads",
        x = "Date",
-       title = "Total number of downloads by organization",
+       title = "Total number of downloads by organization for KB's models on Huggingface",
        fill = "Organization") +
   guides(color = "none")
 
@@ -68,7 +68,7 @@ p_dl_model <- ggplot(data = df_model_top,
   expand_limits(y = 0) +
   labs(y = "Number of downloads",
        x = "Date",
-       title = "Number of downloads by model for top 10 models",
+       title = "Number of downloads by model name for top 10 models",
        fill = "Model") +
   guides(color = "none")
 
