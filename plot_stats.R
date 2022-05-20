@@ -2,7 +2,9 @@ library(ggplot2)
 library(dplyr)
 library(forcats)
 
-dir.create("plots")
+Sys.setlocale("LC_TIME", "C")
+
+# dir.create("plots")
 data_files <- list.files("data", full.names = TRUE)
 
 df <- data_files %>%
@@ -18,7 +20,8 @@ p_dl_total <- ggplot(data = df_total_sum,
   geom_line(colour = "firebrick2") +
   geom_point(shape = 21, size = 3, colour = "black", fill = "firebrick2") + 
   expand_limits(y = 0) +
-  scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 1000, by = 5000)) +
+  scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 2000, by = 10000), 
+                     labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
   scale_x_date(date_labels = "%b %d", breaks = unique(df_model_top$date)) +
   theme_light(base_size = 8) +
   labs(y = "Number of downloads",
@@ -37,7 +40,8 @@ p_dl_org <- ggplot(data = df_sum,
   geom_line(aes(color = organization)) +
   geom_point(shape = 21, size = 3, colour = "black") + 
   expand_limits(y = 0) +
-  scale_y_continuous(breaks = seq(0, max(df_sum$downloads) + 1000, by = 5000)) +
+  scale_y_continuous(breaks = seq(0, max(df_sum$downloads) + 3000, by = 10000),
+                     labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
   scale_x_date(date_labels = "%b %d", breaks = unique(df_model_top$date)) +
   theme_light(base_size = 8) +
   labs(y = "Number of downloads",
@@ -63,7 +67,8 @@ p_dl_model <- ggplot(data = df_model_top,
   geom_line(aes(color = fct_reorder(model_name, desc(downloads)))) +
   geom_point(shape = 21, size = 3, colour = "black") +
   theme_light(base_size = 8) +
-  scale_y_continuous(breaks = seq(0, max(df_model_top$downloads) + 1000, by = 5000)) +
+  scale_y_continuous(breaks = seq(0, max(df_model_top$downloads) + 3000, by = 10000),
+                     labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
   scale_x_date(date_labels = "%b %d", breaks = unique(df_model_top$date)) +
   expand_limits(y = 0) +
   labs(y = "Number of downloads",
@@ -71,7 +76,7 @@ p_dl_model <- ggplot(data = df_model_top,
        title = "Number of downloads by model name for top 10 models",
        fill = "Model") +
   guides(color = "none")
-
+# 
 
 ggsave(p_dl_total, 
        filename = "plots/downloads_total.jpg", 
