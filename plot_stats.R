@@ -22,7 +22,7 @@ p_dl_total <- ggplot(data = df_total_sum,
   expand_limits(y = 0) +
   scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 2000, by = 10000), 
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
-  scale_x_date(date_labels = "%b %d", breaks = unique(df_model_top$date)) +
+  scale_x_date(date_labels = "%b", breaks = unique(df_model_top$date)) +
   theme_light(base_size = 8) +
   labs(y = "Number of downloads",
        x = "Date",
@@ -42,7 +42,7 @@ p_dl_org <- ggplot(data = df_sum,
   expand_limits(y = 0) +
   scale_y_continuous(breaks = seq(0, max(df_sum$downloads) + 3000, by = 10000),
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
-  scale_x_date(date_labels = "%b %d", breaks = unique(df_model_top$date)) +
+  scale_x_date(date_labels = "%b", breaks = unique(df_model_top$date)) +
   theme_light(base_size = 8) +
   labs(y = "Number of downloads",
        x = "Date",
@@ -61,6 +61,9 @@ df_model <- df %>%
 # Models with top 10 most downloads over entire period
 df_model_top <- df[df$model_name %in% df_model$model_name, ]
 
+df_model_top <- df_model_top %>%
+  group_by(date, model_name) %>%
+  summarize(downloads = sum(downloads))
 
 p_dl_model <- ggplot(data = df_model_top, 
                      aes(x = date, y = downloads, fill = fct_reorder(model_name, desc(downloads)))) +
@@ -69,14 +72,14 @@ p_dl_model <- ggplot(data = df_model_top,
   theme_light(base_size = 8) +
   scale_y_continuous(breaks = seq(0, max(df_model_top$downloads) + 3000, by = 10000),
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
-  scale_x_date(date_labels = "%b %d", breaks = unique(df_model_top$date)) +
+  scale_x_date(date_labels = "%b", breaks = unique(df_model_top$date)) +
   expand_limits(y = 0) +
   labs(y = "Number of downloads",
        x = "Date",
        title = "Number of downloads by model name for top 10 models",
        fill = "Model") +
   guides(color = "none")
-# 
+
 
 ggsave(p_dl_total, 
        filename = "plots/downloads_total.jpg", 

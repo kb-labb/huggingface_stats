@@ -3,8 +3,14 @@ library(rvest)
 get_organization_models <- function(org_url){
   organization <- read_html(org_url)
   
+  if (org_url == "KB.html"){
+    xpath <- "/html/body/div/main/div/section[2]/div[1]/div/div/div"
+  } else {
+    xpath <- "/html/body/div/main/div/section[2]/div[2]/div/div/div"
+  }
+  
   organization_models <- organization %>%
-    html_nodes(xpath="/html/body/div/main/div/section[2]/div[1]/div/div/div") %>%
+    html_nodes(xpath=xpath) %>%
     html_nodes("a") %>%
     html_attr("href")
   
