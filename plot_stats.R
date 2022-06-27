@@ -31,24 +31,24 @@ p_dl_total <- ggplot(data = df_total_sum,
 
 
 
-df_sum <- df %>%
-  group_by(organization, date) %>%
-  summarize(downloads = sum(downloads))
-
-p_dl_org <- ggplot(data = df_sum, 
-                      aes(x = date, y = downloads, fill = organization)) +
-  geom_line(aes(color = organization)) +
-  geom_point(shape = 21, size = 3, colour = "black") + 
-  expand_limits(y = 0) +
-  scale_y_continuous(breaks = seq(0, max(df_sum$downloads) + 3000, by = 10000),
-                     labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
-  scale_x_date(date_labels = "%b", breaks = unique(df_model_top$date)) +
-  theme_light(base_size = 8) +
-  labs(y = "Number of downloads",
-       x = "Date",
-       title = "Total number of downloads by organization for KB's models on Huggingface",
-       fill = "Organization") +
-  guides(color = "none")
+# df_sum <- df %>%
+#   group_by(organization, date) %>%
+#   summarize(downloads = sum(downloads))
+# 
+# p_dl_org <- ggplot(data = df_sum, 
+#                       aes(x = date, y = downloads, fill = organization)) +
+#   geom_line(aes(color = organization)) +
+#   geom_point(shape = 21, size = 3, colour = "black") + 
+#   expand_limits(y = 0) +
+#   scale_y_continuous(breaks = seq(0, max(df_sum$downloads) + 3000, by = 10000),
+#                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
+#   scale_x_date(date_labels = "%b", breaks = unique(df_model_top$date)) +
+#   theme_light(base_size = 8) +
+#   labs(y = "Number of downloads",
+#        x = "Date",
+#        title = "Total number of downloads by organization for KB's models on Huggingface",
+#        fill = "Organization") +
+#   guides(color = "none")
 
 
 df_model <- df %>%
@@ -89,13 +89,13 @@ ggsave(p_dl_total,
        height = 1080,
        units = "px")
 
-ggsave(p_dl_org, 
-       filename = "plots/downloads_by_org.jpg", 
-       dpi = 300, 
-       type = "cairo",
-       width = 1920, 
-       height = 1080,
-       units = "px")
+# ggsave(p_dl_org, 
+#        filename = "plots/downloads_by_org.jpg", 
+#        dpi = 300, 
+#        type = "cairo",
+#        width = 1920, 
+#        height = 1080,
+#        units = "px")
 
 
 ggsave(p_dl_model, 
