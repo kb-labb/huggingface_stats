@@ -20,7 +20,7 @@ p_dl_total <- ggplot(data = df_total_sum,
   geom_line(colour = "firebrick2") +
   geom_point(shape = 21, size = 3, colour = "black", fill = "firebrick2") + 
   expand_limits(y = 0) +
-  scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 2000, by = 10000), 
+  scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 5000, by = 10000), 
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
   scale_x_date(date_labels = "%Y-%b", breaks = unique(df_total_sum$date)) +
   theme_light(base_size = 8) +

@@ -4,7 +4,7 @@ get_organization_models <- function(org_url){
   organization <- read_html(org_url)
   
   if (org_url == "KB.html"){
-    xpath <- "/html/body/div/main/div/section[2]/div[1]/div/div/div"
+    xpath <- "/html/body/div/main/div/div/section[2]/div/div[1]/div/div"
   } else {
     xpath <- "/html/body/div/main/div/section[2]/div[2]/div/div/div"
   }
@@ -45,7 +45,6 @@ df$organization <- stringr::str_extract(string = df$model_url, "(?<=co/).*(?=/)"
 # Match everything after last '/' in URL.
 df$model_name <- stringr::str_extract(string = df$model_url, "[^/]*$")
 df$date <- Sys.Date()
-
 
 dir.create("data")
 readr::write_csv(df, file = paste0("data/", Sys.Date(), "_hf.csv"))
