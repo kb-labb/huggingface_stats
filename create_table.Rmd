@@ -1,5 +1,5 @@
 ---
-title: "Månatlig nedladdningsstatistik av KB:s AI-modeller"
+title: "Månatlig nedladdningsstatistik av KB:s 10 mest nedladdade AI-modeller"
 header-includes: 
  \usepackage{geometry}
  \geometry{left=0.40in, right=0.40in}
@@ -44,8 +44,30 @@ df_table <- df_table %>%
   filter(model_name != "ALL-MODELS-MOVED-TO-KBLAB")
 ```
 
-```{r kableknit, echo=FALSE}
+```{r kableknit, echo=FALSE, include=FALSE}
 knitr::kable(df_table, booktabs = TRUE, longtable = TRUE) %>%
+  kableExtra::column_spec(1, width="10em") %>%
+  kableExtra::kable_styling(latex_options = c("hold_position", "repeat_header"),
+                            position="center",
+                            font_size=9)
+```
+
+```{r topmodels, echo=FALSE}
+df_top <- df_model %>%
+  group_by(model_name) %>%
+  summarize(total_downloads = sum(downloads)) %>%
+  arrange(-total_downloads) %>%
+  slice(1:10)
+
+df_model_top <- df_model %>%
+  filter(model_name %in% df_top$model_name)
+
+
+df_table_top <- df_model_top %>%
+  select(model_name, yearmonth, downloads) %>%
+  tidyr::pivot_wider(names_from=yearmonth, values_from=downloads)
+
+knitr::kable(df_table_top, booktabs = TRUE, longtable = TRUE) %>%
   kableExtra::column_spec(1, width="10em") %>%
   kableExtra::kable_styling(latex_options = c("hold_position", "repeat_header"),
                             position="center",
