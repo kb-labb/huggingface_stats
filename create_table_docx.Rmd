@@ -1,0 +1,55 @@
+---
+title: "Untitled"
+output: word_document
+date: "2022-12-02"
+---
+
+---
+title: "Månatlig nedladdningsstatistik av KB:s AI-modeller"
+header-includes: 
+ \usepackage{geometry}
+ \geometry{left=0.40in, right=0.40in}
+output:
+  pdf_document:
+    df_print: kable
+date: "2022-12-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r maketable, include=FALSE}
+library(ggplot2)
+library(dplyr)
+
+Sys.setlocale("LC_TIME", "C")
+
+# dir.create("plots")
+data_files <- list.files("data", full.names = TRUE)
+
+df <- data_files %>%
+  purrr::map_df(~readr::read_csv(.))
+
+df_model <- df %>% 
+  group_by(model_name, date) %>%
+  summarize(downloads = sum(downloads)) %>%
+  mutate(year = lubridate::year(date),
+         month = lubridate::month(date)) %>%
+  arrange(model_name, year, month) %>%
+  ungroup()
+
+df_model["month"] <- stringr::str_pad(df_model$month, side = "left", width = 2, pad = "0")
+df_model["yearmonth"] <- paste(df_model$year, df_model$month, sep = "-")
+
+df_table <- df_model %>%
+  select(model_name, yearmonth, downloads) %>%
+  tidyr::pivot_wider(names_from=yearmonth, values_from=downloads)
+
+df_table <- df_table %>%
+  filter(model_name != "ALL-MODELS-MOVED-TO-KBLAB")
+```
+
+```{r kableknit, echo=FALSE}
+knitr::kable(df_table)
+```
