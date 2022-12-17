@@ -22,7 +22,8 @@ p_dl_total <- ggplot(data = df_total_sum,
   expand_limits(y = 0) +
   scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 5000, by = 10000), 
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
-  scale_x_date(date_labels = "%Y-%b", breaks = unique(df_total_sum$date)) +
+  scale_x_date(date_labels = "%Y-%b", breaks = unique(df_total_sum$date),
+               guide = guide_axis(n.dodge = 2)) +
   theme_light(base_size = 8) +
   labs(y = "Number of downloads",
        x = "Date",
