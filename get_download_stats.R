@@ -1,4 +1,5 @@
 library(rvest)
+library(dplyr)
 
 get_organization_models <- function(org_url){
   organization <- read_html(org_url)
@@ -40,6 +41,10 @@ df_kb <- purrr::map_df(kb_models, get_download_stats)
 
 df <- rbind(df_kblab, df_kb)
 
+# Remove all models that are only tokenizers
+df <- df %>%
+  filter(!stringr::str_detect(model_url, "tokenizer"))
+ 
 # Match everything between penultimate and last '/' in URL. 
 df$organization <- stringr::str_extract(string = df$model_url, "(?<=co/).*(?=/)")
 # Match everything after last '/' in URL.
