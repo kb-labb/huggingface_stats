@@ -24,7 +24,7 @@ p_dl_total <- ggplot(data = df_total_sum,
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
   scale_x_date(date_labels = "%Y-%b", breaks = unique(df_total_sum$date),
                guide = guide_axis(n.dodge = 2)) +
-  theme_light(base_size = 8) +
+  theme_light(base_size = 6) +
   labs(y = "Number of downloads",
        x = "Date",
        title = "Total number of downloads per month for KB's models on Huggingface")
@@ -70,7 +70,7 @@ p_dl_model <- ggplot(data = df_model_top,
                      aes(x = date, y = downloads, fill = fct_reorder(model_name, desc(downloads)))) +
   geom_line(aes(color = fct_reorder(model_name, desc(downloads)))) +
   geom_point(shape = 21, size = 3, colour = "black") +
-  theme_light(base_size = 8) +
+  theme_light(base_size = 6) +
   scale_y_continuous(breaks = seq(0, max(df_model_top$downloads) + 3000, by = 10000),
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
   scale_x_date(date_labels = "%Y-%b", breaks = unique(df_model_top$date), 
@@ -86,7 +86,6 @@ p_dl_model <- ggplot(data = df_model_top,
 ggsave(p_dl_total, 
        filename = "plots/downloads_total.jpg", 
        dpi = 300, 
-       type = "cairo",
        width = 1920, 
        height = 1080,
        units = "px")
@@ -94,7 +93,6 @@ ggsave(p_dl_total,
 # ggsave(p_dl_org, 
 #        filename = "plots/downloads_by_org.jpg", 
 #        dpi = 300, 
-#        type = "cairo",
 #        width = 1920, 
 #        height = 1080,
 #        units = "px")
@@ -103,7 +101,6 @@ ggsave(p_dl_total,
 ggsave(p_dl_model, 
        filename = "plots/downloads_by_model.jpg", 
        dpi = 300, 
-       type = "cairo",
        width = 1920, 
        height = 1080,
        units = "px")

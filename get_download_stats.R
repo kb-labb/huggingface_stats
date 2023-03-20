@@ -21,23 +21,27 @@ get_organization_models <- function(org_url){
 }
 
 get_download_stats <- function(model_url){
-  downloads <- model_url %>% 
+
+  downloads <- model_url %>%
     read_html() %>%
     html_nodes(xpath="/html/body/div/main/div/section[2]/div[1]/dl/dd") %>%
     html_text2()
-  
+
   downloads <- gsub("\\,", "", downloads) # remove commas in e.g. 1,281,893
-  
+
   return(list("model_url" = model_url,
               "downloads" = as.numeric(downloads)))
 }
 
 # Copy outer html from Firefox/Chrome Inspect tool after clicking "Expand models"
-kblab_models <- get_organization_models("KBLab.html") # https://huggingface.co/KBLab 
+kblab_models <- get_organization_models("KBLab.html") # https://huggingface.co/KBLab
 kb_models <- get_organization_models("KB.html") # https://huggingface.co/KB
 
-df_kblab <- purrr::map_df(kblab_models, get_download_stats)
-df_kb <- purrr::map_df(kb_models, get_download_stats)
+# Error handling in case of private models
+poss_get_download_stats <- purrr::possibly(get_download_stats, otherwise=NULL) 
+
+df_kblab <- purrr::map_df(kblab_models, poss_get_download_stats)
+df_kb <- purrr::map_df(kb_models, poss_get_download_stats)
 
 df <- rbind(df_kblab, df_kb)
 
