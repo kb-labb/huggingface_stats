@@ -5,7 +5,7 @@ library(forcats)
 Sys.setlocale("LC_TIME", "C")
 
 # dir.create("plots")
-data_files <- list.files("data", full.names = TRUE)
+data_files <- list.files("data/models", full.names = TRUE)
 
 df <- data_files %>%
   purrr::map_df(~readr::read_csv(.))
