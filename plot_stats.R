@@ -22,7 +22,8 @@ p_dl_total <- ggplot(data = df_total_sum,
   expand_limits(y = 0) +
   scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 5000, by = 10000), 
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
-  scale_x_date(date_labels = "%Y-%b", breaks = unique(df_total_sum$date),
+  scale_x_date(date_labels = "%Y-%b", 
+               breaks = unique(df_total_sum$date)[seq(1, length(unique(df_total_sum$date)), by=2)],
                guide = guide_axis(n.dodge = 2)) +
   theme_light(base_size = 6) +
   labs(y = "Number of downloads",
@@ -73,7 +74,8 @@ p_dl_model <- ggplot(data = df_model_top,
   theme_light(base_size = 6) +
   scale_y_continuous(breaks = seq(0, max(df_model_top$downloads) + 3000, by = 10000),
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
-  scale_x_date(date_labels = "%Y-%b", breaks = unique(df_model_top$date), 
+  scale_x_date(date_labels = "%Y-%b", 
+               breaks = unique(df_total_sum$date)[seq(1, length(unique(df_total_sum$date)), by=2)], 
                guide = guide_axis(n.dodge = 2)) +
   expand_limits(y = 0) +
   labs(y = "Number of downloads",
