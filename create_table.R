@@ -4,12 +4,12 @@ library(dplyr)
 Sys.setlocale("LC_TIME", "C")
 
 # dir.create("plots")
-data_files <- list.files("data", full.names = TRUE)
+data_files <- list.files("data/models", full.names = TRUE)
 
 df <- data_files %>%
   purrr::map_df(~readr::read_csv(.))
 
-df_model <- df %>% 
+df_model <- df %>%
   group_by(model_name, date) %>%
   summarize(downloads = sum(downloads)) %>%
   mutate(year = lubridate::year(date),
@@ -27,5 +27,3 @@ df_table <- df_model %>%
 
 
 knitr::kable(df_table, format="pipe")
-#
-

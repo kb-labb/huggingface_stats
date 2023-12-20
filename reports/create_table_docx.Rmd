@@ -4,17 +4,6 @@ output: word_document
 date: "2022-12-02"
 ---
 
----
-title: "Månatlig nedladdningsstatistik av KB:s AI-modeller"
-header-includes: 
- \usepackage{geometry}
- \geometry{left=0.40in, right=0.40in}
-output:
-  pdf_document:
-    df_print: kable
-date: "2022-12-02"
----
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -26,7 +15,7 @@ library(dplyr)
 Sys.setlocale("LC_TIME", "C")
 
 # dir.create("plots")
-data_files <- list.files("data", full.names = TRUE)
+data_files <- list.files("data/models", full.names = TRUE)
 
 df <- data_files %>%
   purrr::map_df(~readr::read_csv(.))
@@ -53,3 +42,25 @@ df_table <- df_table %>%
 ```{r kableknit, echo=FALSE}
 knitr::kable(df_table)
 ```
+
+```{r topmodels, echo=FALSE}
+df_top <- df_model %>%
+  filter(date >= "2023-01-01") %>%
+  group_by(model_name) %>%
+  summarize(total_downloads = sum(downloads)) %>%
+  arrange(-total_downloads) %>%
+  slice(1:10)
+
+df_model_top <- df_model %>%
+  filter(model_name %in% df_top$model_name)
+
+
+df_table_top <- df_model_top %>%
+  filter(date >= "2023-01-01") %>%
+  select(model_name, yearmonth, downloads) %>%
+  tidyr::pivot_wider(names_from=yearmonth, values_from=downloads)
+
+knitr::kable(df_top)
+```
+
+

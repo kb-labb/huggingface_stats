@@ -6,7 +6,10 @@ header-includes:
 output:
   pdf_document:
     df_print: kable
-date: "2022-12-02"
+date: "2022-12-17"
+always_allow_html: yes
+editor_options:
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -20,12 +23,13 @@ library(dplyr)
 Sys.setlocale("LC_TIME", "C")
 
 # dir.create("plots")
-data_files <- list.files("data", full.names = TRUE)
+data_files <- list.files("data/models", full.names = TRUE)
 
 df <- data_files %>%
   purrr::map_df(~readr::read_csv(.))
 
 df_model <- df %>% 
+  filter(model_name != "ALL-MODELS-MOVED-TO-KBLAB") %>%
   group_by(model_name, date) %>%
   summarize(downloads = sum(downloads)) %>%
   mutate(year = lubridate::year(date),
@@ -39,9 +43,6 @@ df_model["yearmonth"] <- paste(df_model$year, df_model$month, sep = "-")
 df_table <- df_model %>%
   select(model_name, yearmonth, downloads) %>%
   tidyr::pivot_wider(names_from=yearmonth, values_from=downloads)
-
-df_table <- df_table %>%
-  filter(model_name != "ALL-MODELS-MOVED-TO-KBLAB")
 ```
 
 ```{r kableknit, echo=FALSE, include=FALSE}
@@ -54,16 +55,19 @@ knitr::kable(df_table, booktabs = TRUE, longtable = TRUE) %>%
 
 ```{r topmodels, echo=FALSE}
 df_top <- df_model %>%
+  filter(date >= "2023-01-01") %>%
   group_by(model_name) %>%
   summarize(total_downloads = sum(downloads)) %>%
   arrange(-total_downloads) %>%
   slice(1:10)
 
+readr::write_csv(df_top, "kblab_top10_modeller_2023.csv")
+
 df_model_top <- df_model %>%
   filter(model_name %in% df_top$model_name)
 
-
 df_table_top <- df_model_top %>%
+  filter(date >= "2023-01-01") %>%
   select(model_name, yearmonth, downloads) %>%
   tidyr::pivot_wider(names_from=yearmonth, values_from=downloads)
 
@@ -72,4 +76,31 @@ knitr::kable(df_table_top, booktabs = TRUE, longtable = TRUE) %>%
   kableExtra::kable_styling(latex_options = c("hold_position", "repeat_header"),
                             position="center",
                             font_size=9)
+```
+
+
+```{r datasets, echo=FALSE}
+data_files <- list.files("data/datasets", full.names = TRUE)
+
+df <- data_files %>%
+  purrr::map_df(~readr::read_csv(.))
+
+df_dataset <- df %>% 
+  filter(model_name != "ALL-MODELS-MOVED-TO-KBLAB") %>%
+  group_by(model_name, date) %>%
+  summarize(downloads = sum(downloads)) %>%
+  mutate(year = lubridate::year(date),
+         month = lubridate::month(date)) %>%
+  arrange(model_name, year, month) %>%
+  ungroup()
+
+df_top <- df_dataset %>%
+  filter(date >= "2023-01-01") %>%
+  group_by(model_name) %>%
+  summarize(total_downloads = sum(downloads)) %>%
+  arrange(-total_downloads) %>%
+  slice(1:10) %>%
+  rename(dataset_name = model_name)
+
+readr::write_csv(df_top, "kblab_top_datasets_2023.csv")
 ```
