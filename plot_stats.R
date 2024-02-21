@@ -18,14 +18,14 @@ df_total_sum <- df %>%
 p_dl_total <- ggplot(data = df_total_sum, 
               aes(x = date, y = downloads)) +
   geom_line(colour = "firebrick2") +
-  geom_point(shape = 21, size = 3, colour = "black", fill = "firebrick2") + 
+  geom_point(shape = 21, size = 1.5, colour = "black", fill = "firebrick2") + 
   expand_limits(y = 0) +
   scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 5000, by = 10000), 
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
   scale_x_date(date_labels = "%Y-%b", 
                breaks = unique(df_total_sum$date)[seq(1, length(unique(df_total_sum$date)), by=2)],
                guide = guide_axis(n.dodge = 2)) +
-  theme_light(base_size = 6) +
+  theme_light(base_size = 7) +
   labs(y = "Number of downloads",
        x = "Date",
        title = "Total number of downloads per month for KB's models on Huggingface")
@@ -70,8 +70,8 @@ df_model_top <- df_model_top %>%
 p_dl_model <- ggplot(data = df_model_top, 
                      aes(x = date, y = downloads, fill = fct_reorder(model_name, desc(downloads)))) +
   geom_line(aes(color = fct_reorder(model_name, desc(downloads)))) +
-  geom_point(shape = 21, size = 3, colour = "black") +
-  theme_light(base_size = 6) +
+  geom_point(shape = 21, size = 1.5, colour = "black") +
+  theme_light(base_size = 7) +
   scale_y_continuous(breaks = seq(0, max(df_model_top$downloads) + 3000, by = 10000),
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
   scale_x_date(date_labels = "%Y-%b", 
