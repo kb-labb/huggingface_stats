@@ -7,7 +7,7 @@ get_organization_models <- function(org_url){
   if (org_url == "KB.html"){
     xpath <- "/html/body/div/main/div/div/section[2]/div/div[1]/div/div"
   } else {
-    xpath <- "/html/body/div/main/div/section[2]/div[3]/div/div/div"
+    xpath <- "/html/body/div/main/div/div/section[2]/div/div[3]/div/div"
   }
   
   organization_models <- organization %>%
@@ -22,7 +22,7 @@ get_organization_models <- function(org_url){
 
 get_organization_datasets <- function(org_url){
   html <- read_html(org_url)
-  xpath <- "/html/body/div/main/div/section[2]/div[4]/div/div/div"
+  xpath <- "/html/body/div/main/div/div/section[2]/div/div[4]/div/div"
   
   organization_datasets <- html %>%
     html_nodes(xpath=xpath) %>%
