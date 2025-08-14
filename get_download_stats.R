@@ -1,83 +1,80 @@
-library(rvest)
 library(dplyr)
+library(httr2)
+library(jsonlite)
 
-get_organization_models <- function(org_url){
-  organization <- read_html(org_url)
+# https://huggingface.co/models-json?p=1&sort=modified&author=KBLab&withCount=true
+
+get_download_json <- function(author = "KBLab", type="models", page = 0) {
+  # Get (paginated) download stats in JSON format from Hugging Face
+  # type: "models" or "datasets"
   
-  if (org_url == "KB.html"){
-    xpath <- "/html/body/div/main/div/div/section[2]/div/div[1]/div/div"
-  } else {
-    xpath <- "/html/body/div/main/div/div/section[2]/div/div[3]/div/div"
+  url <- paste0("https://huggingface.co/", type, "-json?p=", page, "&sort=modified&author=", author, "&withCount=true")
+  
+  response <- request(url) %>%
+    req_perform()
+  
+  if (response$status_code != 200) {
+    stop("Failed to fetch data: ", response$status_code)
   }
   
-  organization_models <- organization %>%
-    html_nodes(xpath=xpath) %>%
-    html_nodes("a") %>%
-    html_attr("href")
-  
-  org_model_urls <- paste0("https://huggingface.co", organization_models)
-  
-  return(org_model_urls)
+  content <- jsonlite::fromJSON(resp_body_string(response))
+  return(content)
 }
 
-get_organization_datasets <- function(org_url){
-  html <- read_html(org_url)
-  xpath <- "/html/body/div/main/div/div/section[2]/div/div[4]/div/div"
+format_stats <- function(df) {
+  # Format the download stats to conform to the desired structure
+  # Extract model_name from id with format: organization/model_name
+  df$model_name <- stringr::str_extract(df$id, "(?<=/)[^/]+$")
+  df$organization <- df$author # org
+  df$date <- Sys.Date() # Current date
   
-  organization_datasets <- html %>%
-    html_nodes(xpath=xpath) %>%
-    html_nodes("a") %>%
-    html_attr("href")
-  
-  org_dataset_urls <- paste0("https://huggingface.co", organization_datasets)
-  return(org_dataset_urls)
-}
-
-get_download_stats <- function(url, type="model"){
-  
-  if (type == "model"){
-    xpath <- "/html/body/div/main/div/section[2]/div[1]/dl/dd"
-  } else if (type == "dataset") {
-    xpath <- "/html/body/div/main/div[2]/section[2]/dl/dd"
+  if (df$repoType[1] == "model") {
+    df$model_url <- paste0("https://huggingface.co/", df$id)
+  } else if (df$repoType[1] == "dataset") {
+    df$model_url <- paste0("https://huggingface.co/datasets/", df$id)
   }
   
-  downloads <- url %>%
-    read_html() %>%
-    html_nodes(xpath=xpath) %>%
-    html_text2()
+  df <- df %>%
+    select(model_url, downloads, organization, model_name, date)
   
-  downloads <- gsub("\\,", "", downloads) # remove commas in e.g. 1,281,893
-  
-  return(list("model_url" = url,
-              "downloads" = as.numeric(downloads)))
+  return(df)
 }
 
-# Copy outer html from Firefox/Chrome Inspect tool after clicking "Expand models"
-kblab_models <- get_organization_models("KBLab.html") # https://huggingface.co/KBLab
-kblab_datasets <- get_organization_datasets("KBLab.html")
-kb_models <- get_organization_models("KB.html") # https://huggingface.co/KB
+get_download_stats <- function(author = "KBLab", type = "models") {
+  # Get all pages of download stats for a given author and type (models or datasets).
+  # Format the stats and return as a tibble dataframe.
+  stats <- get_download_json(author = author, type = type, page = 0)
+  
+  total_items <- stats$numTotalItems
+  num_items_per_page <- stats$numItemsPerPage # API returns 30 items per page by default
+  page_index <- stats$pageIndex
+  
+  total_pages <- ceiling(total_items / num_items_per_page)
+  
+  all_stats <- vector(mode="list", length = total_pages)
+  
+  all_stats[[1]] <- tibble::as_tibble(stats[[type]])
+  
+  if (total_pages > 1) {
+    for (i in 2:total_pages) {
+      stats_page <- get_download_json(author = author, type = type, page = i - 1)
+      all_stats[[i]] <- tibble::as_tibble(stats_page[[type]])
+    }
+  }
+  
+  all_stats <- dplyr::bind_rows(all_stats)
+  return(format_stats(all_stats))
+}
 
-# Error handling in case of private models
-poss_get_download_stats <- purrr::possibly(get_download_stats, otherwise=NULL) 
-
-df_kblab <- purrr::map_df(kblab_models, ~poss_get_download_stats(.x, type="model"))
-df_dataset <- purrr::map_df(kblab_datasets, ~poss_get_download_stats(.x, type="dataset"))
-df_kb <- purrr::map_df(kb_models, poss_get_download_stats)
+df_kblab <- get_download_stats(author = "KBLab", type="models")
+df_kb <- get_download_stats(author = "KB", type="models")
+df_dataset <- get_download_stats(author = "KBLab", type="datasets")
 
 df <- rbind(df_kblab, df_kb)
 
 # Remove all models that are only tokenizers
 df <- df %>%
   filter(!stringr::str_detect(model_url, "tokenizer"))
- 
-# Match everything between penultimate and last '/' in URL. 
-df$organization <- stringr::str_extract(string = df$model_url, "(?<=co/).*(?=/)")
-df_dataset$organization <- stringr::str_extract(string = df_dataset$model_url, "(?<=datasets/).*(?=/)")
-# Match everything after last '/' in URL.
-df$model_name <- stringr::str_extract(string = df$model_url, "[^/]*$")
-df_dataset$model_name <- stringr::str_extract(string = df_dataset$model_url, "[^/]*$") # dataset name
-df$date <- Sys.Date()
-df_dataset$date <- Sys.Date()
 
 dir.create("data")
 readr::write_csv(df, file = paste0("data/models/", Sys.Date(), "_hf.csv"))
