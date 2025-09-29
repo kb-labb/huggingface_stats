@@ -13,7 +13,11 @@ df <- data_files %>%
 
 df_total_sum <- df %>% 
   group_by(date) %>%
-  summarize(downloads = sum(downloads))
+  summarize(downloads = sum(downloads)) %>%
+  mutate(year = lubridate::year(date), month=lubridate::month(date))
+
+# Output totals to data/totals/total_downloads.csv
+readr::write_csv(df_total_sum, "data/totals/total_downloads.csv")
   
 p_dl_total <- ggplot(data = df_total_sum, 
               aes(x = date, y = downloads)) +
