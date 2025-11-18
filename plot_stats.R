@@ -17,14 +17,14 @@ df_total_sum <- df %>%
   mutate(year = lubridate::year(date), month=lubridate::month(date))
 
 # Output totals to data/totals/total_downloads.csv
-readr::write_csv(df_total_sum, "data/totals/total_downloads.csv")
+readr::write_csv(df_total_sum, "data/totals/total_downloads_monthly.csv")
   
 p_dl_total <- ggplot(data = df_total_sum, 
               aes(x = date, y = downloads)) +
   geom_line(colour = "firebrick2") +
   geom_point(shape = 21, size = 1.5, colour = "black", fill = "firebrick2") + 
   expand_limits(y = 0) +
-  scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 5000, by = 50000), 
+  scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 5000, by = 100000), 
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
   scale_x_date(date_labels = "%Y-%b", 
                breaks = unique(df_total_sum$date)[seq(1, length(unique(df_total_sum$date)), by=4)],
@@ -76,7 +76,7 @@ p_dl_model <- ggplot(data = df_model_top,
   geom_line(aes(color = fct_reorder(model_name, desc(downloads)))) +
   geom_point(shape = 21, size = 1.5, colour = "black") +
   theme_light(base_size = 8) +
-  scale_y_continuous(breaks = seq(0, max(df_model_top$downloads) + 3000, by = 20000),
+  scale_y_continuous(breaks = seq(0, max(df_model_top$downloads) + 3000, by = 100000),
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
   scale_x_date(date_labels = "%Y-%b", 
                breaks = unique(df_total_sum$date)[seq(1, length(unique(df_total_sum$date)), by=4)], 
