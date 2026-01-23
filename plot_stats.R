@@ -24,13 +24,14 @@ p_dl_total <- ggplot(data = df_total_sum,
   geom_line(colour = "firebrick2") +
   geom_point(shape = 21, size = 1.5, colour = "black", fill = "firebrick2") + 
   expand_limits(y = 0) +
-  scale_y_continuous(breaks = seq(0, max(df_total_sum$downloads) + 5000, by = 100000), 
-                     labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
+  scale_y_continuous(labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE),
+                     trans="log10") +
   scale_x_date(date_labels = "%Y-%b", 
                breaks = unique(df_total_sum$date)[seq(1, length(unique(df_total_sum$date)), by=4)],
                guide = guide_axis(n.dodge = 2)) +
   theme_light(base_size = 8) +
-  labs(y = "Number of downloads",
+  theme(panel.grid.minor = element_blank()) +
+  labs(y = "Number of downloads (log scale)",
        x = "Date",
        title = "Total number of downloads per month for KB's models on Huggingface")
 
@@ -71,20 +72,25 @@ df_model_top <- df_model_top %>%
   group_by(date, model_name) %>%
   summarize(downloads = sum(downloads))
 
+
+max_log <- log(max(df_model_top$downloads), base=10) + 0.05
+log_breaks <- 10^(seq(3, ceiling(max_log), by=1))
 p_dl_model <- ggplot(data = df_model_top, 
                      aes(x = date, y = downloads, fill = fct_reorder(model_name, desc(downloads)))) +
   geom_line(aes(color = fct_reorder(model_name, desc(downloads)))) +
   geom_point(shape = 21, size = 1.5, colour = "black") +
   theme_light(base_size = 8) +
-  scale_y_continuous(breaks = seq(0, max(df_model_top$downloads) + 3000, by = 100000),
-                     labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE)) +
+  scale_y_continuous(breaks = log_breaks,
+                     labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE),
+                     trans="log10") +
   scale_x_date(date_labels = "%Y-%b", 
                breaks = unique(df_total_sum$date)[seq(1, length(unique(df_total_sum$date)), by=4)], 
                guide = guide_axis(n.dodge = 2)) +
   expand_limits(y = 0) +
   theme(legend.text = element_text(size = 5.5),
-        legend.title = element_text(size = 7)) +
-  labs(y = "Number of downloads",
+        legend.title = element_text(size = 7),
+        panel.grid.minor=element_blank()) +
+  labs(y = "Number of downloads (log scale)",
        x = "Date",
        title = "Number of downloads by model name for top 10 models",
        fill = "Model") +
