@@ -84,7 +84,7 @@ p_dl_model <- ggplot(data = df_model_top,
                      labels = function(x) format(x, big.mark = " ", decimal.mark = ".", scientific = FALSE),
                      trans="log10") +
   scale_x_date(date_labels = "%Y-%b", 
-               breaks = unique(df_total_sum$date)[seq(1, length(unique(df_total_sum$date)), by=4)], 
+               breaks = unique(df_total_sum$date)[seq(1, length(unique(df_total_sum$date)), by=6)], 
                guide = guide_axis(n.dodge = 2)) +
   expand_limits(y = 0) +
   theme(legend.text = element_text(size = 5.5),
